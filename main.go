@@ -29,15 +29,10 @@ var iconData []byte
 func main() {
 	myApp := app.New()
 	icon := fyne.NewStaticResource("icon.ico", iconData)
-	//if err == nil {
 	myApp.SetIcon(icon)
-	//} else {
-	//	fmt.Println(err)
-	//}
 	window := myApp.NewWindow("Let's Fuck up PTA !!!!")
 
 	var compiler string
-	// 创建界面元素
 	cookieEntry := widget.NewEntry()
 	urlEntry := widget.NewEntry()
 	compilerSelector := widget.NewSelect([]string{"G++", "Clang++"}, func(selected string) {
@@ -70,6 +65,9 @@ func main() {
 		go func() {
 			cookie := "PTASession=" + cookieEntry.Text
 			content := contentEntry.Text
+			if content == "" || cookie == "" || urlEntry.Text == "" {
+				return
+			}
 			parsedURL, err := url.Parse(urlEntry.Text)
 			if err != nil {
 				dialog.ShowError(err, window)
@@ -80,8 +78,12 @@ func main() {
 			prefix := "problem-sets/"
 			start := strings.Index(path, prefix)
 			start += len(prefix)
+			if start == -1 || !strings.Contains(path, prefix) {
+				dialog.ShowError(errors.New("url有误，应当像这样：\n https://pintia.cn/problem-sets/1900019993728618496/exam/problems/type/7?problemSetProblemId=1900019993753784320&page=0"), window)
+				return
+			}
 			end := strings.Index(path[start:], "/")
-			if start == -1 || end == -1 {
+			if end == -1 {
 				dialog.ShowError(errors.New("url有误，应当像这样：\n https://pintia.cn/problem-sets/1900019993728618496/exam/problems/type/7?problemSetProblemId=1900019993753784320&page=0"), window)
 				return
 			}
@@ -92,11 +94,7 @@ func main() {
 			req.Header.Set("Accept", "application/json;charset=UTF-8")
 			resp, err := client.Do(req)
 			defer resp.Body.Close()
-			fmt.Println("Content-Encoding:", resp.Header.Get("Content-Encoding"))
-			fmt.Println("Content-Type:", resp.Header.Get("Content-Type"))
-			//reader, err := gzip.NewReader(resp.Body)
 			body, err := io.ReadAll(resp.Body)
-			fmt.Println(string(body))
 			var data map[string]interface{}
 			var examId string
 			err = json.Unmarshal(body, &data)
@@ -115,9 +113,7 @@ func main() {
 				dialog.ShowError(errors.New("未能找到exam"), window)
 				return
 			}
-			// 替换换行符
-			replaced := strings.ReplaceAll(content, "\r\n", "\n")
-			replaced = strings.ReplaceAll(replaced, "\n", `\n`)
+
 			body, err = json.Marshal(Submission{
 				ProblemType: "PROGRAMMING",
 				Details: []any{
@@ -125,7 +121,7 @@ func main() {
 						"problemId":           "0",
 						"problemSetProblemId": problemSetProblemId,
 						"programmingSubmissionDetail": map[string]any{
-							"program":  replaced,
+							"program":  content,
 							"compiler": compiler,
 						},
 					},
@@ -158,11 +154,11 @@ func main() {
 					resp, err = client.Do(req)
 					defer resp.Body.Close()
 					body, err = io.ReadAll(resp.Body)
-					fmt.Println(string(body))
 					err = json.Unmarshal(body, &data)
 					if submission, ok := data["submission"].(map[string]interface{}); ok {
 						if status, ok := submission["status"].(string); ok && status != "WAITING" && status != "JUDGING" {
-							score, _ := submission["score"].(float32)
+							score, _ := submission["score"].(float64)
+							fmt.Println(score)
 							dialog.ShowInformation("fuck up pta:", "status:"+status+"\nscore:"+fmt.Sprintf("%.2f", score), window)
 							return
 						}
@@ -182,8 +178,6 @@ func main() {
 		}()
 
 	})
-
-	// 布局设置
 	content := container.NewVBox(
 		widget.NewLabel("Settings:"),
 		urlEntry,
