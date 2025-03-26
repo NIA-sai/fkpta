@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,14 +23,17 @@ type Submission struct {
 	Details     []any  `json:"details"`
 }
 
+//go:embed "icon.ico"
+var iconData []byte
+
 func main() {
 	myApp := app.New()
-	icon, err := fyne.LoadResourceFromPath("D:/Code/Go/Projects/fkpta/icon.ico")
-	if err == nil {
-		myApp.SetIcon(icon)
-	} else {
-		fmt.Println(err)
-	}
+	icon := fyne.NewStaticResource("icon.ico", iconData)
+	//if err == nil {
+	myApp.SetIcon(icon)
+	//} else {
+	//	fmt.Println(err)
+	//}
 	window := myApp.NewWindow("Let's Fuck up PTA !!!!")
 
 	var compiler string
@@ -51,8 +55,9 @@ func main() {
 	contentEntry.SetPlaceHolder("program")
 	urlEntry.SetPlaceHolder("url")
 	compilerSelector.SetSelected("G++")
-	helpDetail := widget.NewRichTextWithText(
-		"url就是你正在做的这道题的连接，浏览器顶部那个\ncookie需要你在登录pta的情况下打开浏览器工具，找到（更多工具-）应用-储存-Cookie里面一个名叫PTASession的粘贴过来，注意这个Cookie可能经常变化，应当尝试重新复制粘贴过来")
+	helpDetail := widget.NewRichTextFromMarkdown(
+		"url就是你正在做的这道题的连接，浏览器顶部那个\n\ncookie需要你在登录pta的情况下打开浏览器工具，找到（更多工具-）应用-储存-Cookie里面一个名叫PTASession的粘贴过来，注意这个Cookie可能经常变化，应当尝试重新复制粘贴过来\n\n[一图流（chrome为例）](https://cloudreve.zsgbp.site/f/lrcj/PixPin_2025-03-26_18-35-25.png)")
+
 	helpDetail.Wrapping = fyne.TextWrapWord
 	help := widget.NewAccordion(
 		&widget.AccordionItem{
