@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+message ExamResponse {
+  string serverTime = 1;
+  Exam exam = 2;
+  ProblemSet problemSet = 3;
+  string status = 4;
+  Permission permission = 5;
+  string collaboratorPermission = 6;
+}
+
+message Exam {
+  string id = 1;
+  double score = 2;
+  string startAt = 3;
+  string endAt = 4;
+  int32 acceptCount = 5;
+  ExamConfig examConfig = 6;
+  StudentUser studentUser = 7;
+  string problemSetId = 8;
+  string userId = 9;
+  bool ended = 10;
+  string status = 11;
+  bool resetStatus = 12;
+  double adjustAmount = 13;
+}
+
+message ExamConfig {
+  // 可根据实际需要添加具体的字段
+}
+
+message StudentUser {
+  string studentNumber = 1;
+  string name = 2;
+  string id = 3;
+}
+
+message ProblemSet {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  string timeType = 5;
+  ProblemSetConfig problemSetConfig = 6;
+  string startAt = 7;
+  string endAt = 8;
+  double duration = 9;
+  string shareCode = 10;
+  bool manageable = 11;
+  string collaboratorPermission = 12;
+  string ownerOrganizationId = 13;
+  string ownerId = 14;
+  bool hide = 15;
+  string stage = 16;
+  string announcement = 17;
+  bool internal = 18;
+  string feature = 19;
+  string batchJudgeAt = 20;
+  Connections connections = 21;
+}
+
+message ProblemSetConfig {
+  repeated string compilers = 1;
+  string multipleChoiceMoreThanOneAnswerProblemScoringMethod = 2;
+  string scoringRule = 3;
+  bool hideScoreboard = 4;
+  int32 hidingTime = 5;
+  bool showNameInRanking = 6;
+  bool hideOtherProblemSets = 7;
+  bool allowStudentLogin = 8;
+  int32 allowedLoginSecondsBeforeStart = 9;
+  bool omsProtected = 10;
+  bool allowSubmitExam = 11;
+  repeated string problemTypeOrder = 12;
+  bool useStrictCodeJudger = 13;
+  bool showBulletinBoard = 14;
+  bool showDetections = 15;
+  string examGroupId = 16;
+  bool enableCustomTestData = 17;
+  bool enableVirtualPrinter = 18;
+  bool blindJudgeSubjective = 19;
+  bool autoSave = 20;
+  bool forbidPasting = 21;
+  bool allowAddCollection = 22;
+  bool allowFilterUserGroup = 23;
+  bool hasGrading = 24;
+  bool enableXcpcContestService = 25;
+  string collectionDerivedProblemSetId = 26;
+  bool showDifficulty = 27;
+  string postPayAccountId = 28;
+  string postPayAccountType = 29;
+  bool hideProgrammingJudgeResponseContents = 30;
+  bool hideScore = 31;
+  bool enableAi = 32;
+  bool enableCompetitionService = 33;
+}
+
+message Connections {
+  // 根据需要补充
+}
+
+message Permission {
+  int32 permission = 1;
+}
